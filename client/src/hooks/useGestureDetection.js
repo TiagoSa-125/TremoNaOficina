@@ -14,18 +14,15 @@
 // ── Utilitários ──────────────────────────────────────────────────────────────
 
 function dist(a, b) {
-  return Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 + (a.z-b.z)**2);
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2);
 }
 
 function touching(a, b, thr = 0.07) { return dist(a, b) < thr; }
 
-// Dedo estendido: ponta mais alta (menor y) que a articulação PIP
 function up(lm, tip, pip) { return lm[tip].y < lm[pip].y; }
 
-// Dedo dobrado: ponta mais baixa que MCP (fechado)
 function curled(lm, tip, mcp) { return lm[tip].y > lm[mcp].y - 0.02; }
 
-// Ângulo do vetor entre dois pontos (graus, 0=direita, 90=cima)
 function angle(a, b) {
   return Math.atan2(-(b.y - a.y), b.x - a.x) * 180 / Math.PI;
 }
@@ -35,185 +32,173 @@ function angle(a, b) {
 export function detectLGPLetter(lm) {
   if (!lm || lm.length < 21) return null;
 
-  // Estado de cada dedo
-  const iUp = up(lm, 8, 6);   // indicador
-  const mUp = up(lm, 12, 10); // médio
-  const rUp = up(lm, 16, 14); // anelar
-  const pUp = up(lm, 20, 18); // mindinho (pinky)
+  const iUp = up(lm, 8, 6);
+  const mUp = up(lm, 12, 10);
+  const rUp = up(lm, 16, 14);
+  const pUp = up(lm, 20, 18);
 
-  const iCurl = curled(lm, 8, 5);
-  const mCurl = curled(lm, 12, 9);
-  const rCurl = curled(lm, 16, 13);
-  const pCurl = curled(lm, 20, 17);
+  const thumbOut = lm[4].x < lm[3].x - 0.03 || lm[4].x > lm[3].x + 0.05;
+  const thumbUp  = lm[4].y < lm[3].y - 0.04;
 
-  // Polegar: considera estendido se ponta está à esquerda da base (mão direita espelhada)
-  const thumbOut = lm[4].x < lm[3].x - 0.02 || lm[4].x > lm[3].x + 0.04;
-  const thumbUp  = lm[4].y < lm[3].y - 0.03;
+  const tTip = lm[4], tIP = lm[3], tMCP = lm[2], tBase = lm[1];
+  const iTip = lm[8], iPIP = lm[6], iMCP = lm[5];
+  const mTip = lm[12], mPIP = lm[10], mMCP = lm[9];
+  const rTip = lm[16], rPIP = lm[14];
+  const pTip = lm[20], pPIP = lm[18];
 
-  // Pontas e articulações úteis
-  const wrist = lm[0];
-  const tTip  = lm[4],  tIP = lm[3], tMCP = lm[2];
-  const iTip  = lm[8],  iPIP = lm[6], iMCP = lm[5];
-  const mTip  = lm[12], mPIP = lm[10];
-  const rTip  = lm[16], rPIP = lm[14];
-  const pTip  = lm[20], pPIP = lm[18];
-
-  // ── A: punho fechado, polegar ao lado (não por cima) ──────────────────────
-  // Todos fechados, polegar lateral (não sobre os dedos)
-  if (!iUp && !mUp && !rUp && !pUp) {
-    const thumbOverFist = tTip.y < iTip.y + 0.05 && tTip.x > iMCP.x - 0.05;
-    if (!thumbOverFist && tTip.x < iMCP.x + 0.04) return 'A';
+  // A — punho fechado, polegar ao lado
+  if (!iUp && !mUp && !rUp && !pUp && !thumbUp) {
+    const thumbSide = Math.abs(tTip.x - iMCP.x) < 0.09;
+    const thumbNotOver = tTip.y > iTip.y - 0.04;
+    if (thumbSide && thumbNotOver) return 'A';
   }
 
-  // ── B: 4 dedos estendidos juntos, polegar dobrado para dentro ─────────────
-  if (iUp && mUp && rUp && pUp) {
-    const spread = Math.abs(iTip.x - pTip.x);
-    if (spread < 0.14 && !thumbOut) return 'B';
+  // B — polegar para cima (joinha), outros fechados
+  if (!iUp && !mUp && !rUp && !pUp && thumbUp) {
+    return 'B';
   }
 
-  // ── C: mão curvada em C (semi-fechada), todos os dedos curvados juntos ────
-  if (!iUp && !mUp && !rUp && !pUp) {
-    // Ponta do indicador e polegar formam abertura de C
+  // C — mão curvada em C
+  if (!iUp && !mUp && !rUp && !pUp && !thumbUp) {
     const cGap = dist(tTip, iTip);
-    const fingersCurvedNotFull = lm[8].y > lm[5].y - 0.05 && lm[8].y < lm[5].y + 0.12;
-    if (cGap > 0.07 && cGap < 0.22 && fingersCurvedNotFull) return 'C';
+    const curvedNotFull = lm[8].y > lm[5].y - 0.04 && lm[8].y < lm[5].y + 0.15;
+    if (cGap > 0.08 && cGap < 0.22 && curvedNotFull && !thumbOut) return 'C';
   }
 
-  // ── D: indicador para cima em arco, outros fechados, polegar toca no médio ─
+  // D — indicador para cima, polegar toca no médio
   if (iUp && !mUp && !rUp && !pUp) {
-    if (touching(tTip, mTip, 0.09)) return 'D';
+    if (touching(tTip, mTip, 0.10) || touching(tTip, mMCP, 0.09)) return 'D';
   }
 
-  // ── E: todos os dedos dobrados (em garra), polegar por baixo ──────────────
-  if (!iUp && !mUp && !rUp && !pUp) {
-    // Pontas dos dedos tocam na palma / abaixo do PIP
-    const garra = lm[8].y > lm[6].y && lm[12].y > lm[10].y;
-    if (garra && touching(tTip, iPIP, 0.08)) return 'E';
+  // E — garra, todos dobrados
+  if (!iUp && !mUp && !rUp && !pUp && !thumbUp && !thumbOut) {
+    const garra = lm[8].y > lm[6].y + 0.01 && lm[12].y > lm[10].y + 0.01;
+    if (garra) return 'E';
   }
 
-  // ── F: polegar + indicador fazem OK/círculo, outros 3 estendidos ──────────
+  // F — OK: polegar+indicador círculo, 3 estendidos
   if (!iUp && mUp && rUp && pUp) {
-    if (touching(tTip, iTip, 0.07)) return 'F';
+    if (touching(tTip, iTip, 0.08)) return 'F';
   }
 
-  // ── G: indicador e polegar apontam horizontalmente para o lado (pistola) ──
+  // G — indicador horizontal para o lado
   if (iUp && !mUp && !rUp && !pUp) {
-    // Indicador quase horizontal
     const iAngle = Math.abs(angle(iMCP, iTip));
-    if (iAngle > 150 || iAngle < 30) return 'G'; // horizontal esq ou dir
+    if (iAngle > 150 || iAngle < 30) return 'G';
   }
 
-  // ── H: indicador + médio estendidos e horizontais ─────────────────────────
+  // H — indicador + médio horizontais juntos
   if (iUp && mUp && !rUp && !pUp) {
     const iAngle = Math.abs(angle(iMCP, iTip));
-    const mAngle = Math.abs(angle(lm[9], mTip));
+    const mAngle = Math.abs(angle(mMCP, mTip));
     const bothHoriz = (iAngle > 140 || iAngle < 40) && (mAngle > 140 || mAngle < 40);
-    const close = Math.abs(iTip.y - mTip.y) < 0.06;
-    if (bothHoriz && close) return 'H';
+    if (bothHoriz) return 'H';
   }
 
-  // ── I: só mindinho estendido, polegar dobrado ─────────────────────────────
-  if (!iUp && !mUp && !rUp && pUp) {
-    if (!thumbOut) return 'I';
+  // I — só mindinho, polegar fechado
+  if (!iUp && !mUp && !rUp && pUp && !thumbOut && !thumbUp) {
+    return 'I';
   }
 
-  // ── J: mindinho estendido + polegar para fora (como Y mas sem anelar) ─────
-  if (!iUp && !mUp && !rUp && pUp) {
-    if (thumbOut) return 'J';
+  // J — mindinho + polegar (shaka/telefone)
+  if (!iUp && !mUp && !rUp && pUp && (thumbOut || thumbUp)) {
+    return 'J';
   }
 
-  // ── K: indicador para cima, médio para o lado, polegar no meio ────────────
+  // K — indicador cima, médio oblíquo, polegar no meio
   if (iUp && mUp && !rUp && !pUp) {
-    const vSpread = Math.abs(iTip.x - mTip.x) > 0.04;
-    if (vSpread && touching(tTip, mPIP, 0.09)) return 'K';
+    const spread = Math.abs(iTip.x - mTip.x) > 0.04;
+    if (spread && touching(tTip, mPIP, 0.10)) return 'K';
   }
 
-  // ── L: polegar estendido horizontal + indicador para cima (forma L) ───────
+  // L — indicador para cima + polegar para o lado (forma L)
   if (iUp && !mUp && !rUp && !pUp) {
-    // Polegar claramente horizontal e indicador claramente vertical
-    const thumbHoriz = Math.abs(tTip.y - tMCP.y) < 0.07;
-    const indexVert  = iTip.y < iMCP.y - 0.1;
-    if (thumbHoriz && indexVert && dist(tTip, iTip) > 0.1) return 'L';
+    const thumbHoriz = Math.abs(tTip.y - tMCP.y) < 0.07 && thumbOut;
+    const indexVert  = iTip.y < iMCP.y - 0.08;
+    if (thumbHoriz && indexVert) return 'L';
   }
 
-  // ── M: 3 dedos (ind+med+anel) dobrados sobre o polegar ───────────────────
-  if (!iUp && !mUp && !rUp && !pUp) {
-    const threeOverThumb = lm[8].y > tTip.y && lm[12].y > tTip.y && lm[16].y > tTip.y;
-    if (threeOverThumb && lm[20].y > lm[17].y) return 'M';
+  // M — 3 dedos dobrados sobre o polegar
+  if (!iUp && !mUp && !rUp && !pUp && !thumbUp) {
+    const threeOverThumb =
+      lm[8].y > tTip.y - 0.02 &&
+      lm[12].y > tTip.y - 0.02 &&
+      lm[16].y > tTip.y - 0.02;
+    if (threeOverThumb && lm[20].y > lm[17].y - 0.01) return 'M';
   }
 
-  // ── N: indicador + médio dobrados sobre o polegar ────────────────────────
-  if (!iUp && !mUp && !rUp && !pUp) {
-    const twoOverThumb = lm[8].y > tTip.y && lm[12].y > tTip.y;
-    const ringNotOver  = lm[16].y < tTip.y + 0.06;
-    if (twoOverThumb && ringNotOver) return 'N';
+  // N — 2 dedos dobrados sobre o polegar
+  if (!iUp && !mUp && !rUp && !pUp && !thumbUp) {
+    const twoOverThumb = lm[8].y > tTip.y - 0.02 && lm[12].y > tTip.y - 0.02;
+    const ringFree = lm[16].y < tTip.y + 0.05;
+    if (twoOverThumb && ringFree) return 'N';
   }
 
-  // ── O: todos os dedos curvados a tocar no polegar (forma O) ───────────────
-  if (!iUp && !mUp && !rUp && !pUp) {
-    if (touching(tTip, iTip, 0.06) && touching(iTip, mTip, 0.07)) return 'O';
+  // O — círculo com todos os dedos
+  if (!iUp && !mUp && !rUp && !pUp && !thumbUp) {
+    if (touching(tTip, iTip, 0.07) && touching(iTip, mTip, 0.08)) return 'O';
   }
 
-  // ── P: indicador aponta para baixo, polegar para fora, resto fechado ──────
+  // P — indicador para baixo, polegar para fora
   if (!iUp && !mUp && !rUp && !pUp) {
-    const pointDown = lm[8].y > lm[5].y + 0.08;
+    const pointDown = lm[8].y > lm[5].y + 0.07;
     if (pointDown && thumbOut) return 'P';
   }
 
-  // ── Q: indicador e polegar apontam para baixo ─────────────────────────────
+  // Q — indicador + polegar para baixo juntos
   if (!iUp && !mUp && !rUp && !pUp) {
-    const idxDown   = lm[8].y > lm[5].y + 0.08;
+    const idxDown   = lm[8].y > lm[5].y + 0.07;
     const thumbDown = tTip.y > tMCP.y + 0.04;
     if (idxDown && thumbDown && !thumbOut) return 'Q';
   }
 
-  // ── R: indicador e médio cruzados (entrelaçados) ──────────────────────────
+  // R — indicador + médio cruzados para cima
   if (iUp && mUp && !rUp && !pUp) {
-    const crossed = Math.abs(iTip.x - mTip.x) < 0.025;
-    if (crossed) return 'R';
+    const crossed = Math.abs(iTip.x - mTip.x) < 0.03;
+    if (crossed && !touching(tTip, mPIP, 0.10)) return 'R';
   }
 
-  // ── S: punho fechado, polegar POR CIMA dos dedos ──────────────────────────
-  if (!iUp && !mUp && !rUp && !pUp) {
-    const thumbOverFist = tTip.y < lm[8].y && tTip.x > iMCP.x - 0.02;
+  // S — punho fechado, polegar por cima dos dedos
+  if (!iUp && !mUp && !rUp && !pUp && !thumbUp) {
+    const thumbOverFist = tTip.y < lm[8].y + 0.02 && tTip.x > iMCP.x - 0.02;
     if (thumbOverFist) return 'S';
   }
 
-  // ── T: polegar espetado entre indicador e médio (punho) ───────────────────
+  // T — polegar espetado na base do indicador
   if (!iUp && !mUp && !rUp && !pUp) {
-    if (touching(tTip, iPIP, 0.06)) return 'T';
+    if (touching(tTip, iPIP, 0.07)) return 'T';
   }
 
-  // ── U: indicador e médio juntos e estendidos ─────────────────────────────
+  // U — indicador + médio juntos para cima
   if (iUp && mUp && !rUp && !pUp) {
-    const together = Math.abs(iTip.x - mTip.x) < 0.03;
-    if (together) return 'U';
+    const together = Math.abs(iTip.x - mTip.x) < 0.035;
+    if (together && !touching(tTip, mPIP, 0.10)) return 'U';
   }
 
-  // ── V: indicador e médio em V aberto ─────────────────────────────────────
+  // V — indicador + médio em V aberto
   if (iUp && mUp && !rUp && !pUp) {
     const vOpen = Math.abs(iTip.x - mTip.x) > 0.05;
-    if (vOpen && !touching(tTip, mPIP, 0.09)) return 'V';
+    if (vOpen) return 'V';
   }
 
-  // ── W: indicador, médio e anelar estendidos ───────────────────────────────
+  // W — 3 dedos estendidos e separados
   if (iUp && mUp && rUp && !pUp) {
     return 'W';
   }
 
-  // ── X: indicador dobrado em gancho (ponta virada para a palma) ────────────
+  // X — indicador em gancho
   if (!iUp && !mUp && !rUp && !pUp) {
-    const hook = lm[8].y > lm[7].y + 0.01 && lm[7].y < lm[6].y;
+    const hook = lm[8].y > lm[7].y + 0.01 && lm[7].y < lm[6].y && lm[8].y < lm[5].y;
     if (hook) return 'X';
   }
 
-  // ── Y: polegar + mindinho estendidos, outros fechados ────────────────────
-  if (!iUp && !mUp && !rUp && pUp) {
-    if (thumbOut || thumbUp) return 'Y';
+  // Y — polegar + mindinho (shaka)
+  if (!iUp && !mUp && !rUp && pUp && (thumbOut || thumbUp)) {
+    return 'Y';
   }
 
-  // ── Z: indicador estendido vertical (desenha Z no ar) ────────────────────
-  if (iUp && !mUp && !rUp && !pUp) {
+  // Z — indicador para cima, polegar fechado
+  if (iUp && !mUp && !rUp && !pUp && !thumbOut) {
     return 'Z';
   }
 
