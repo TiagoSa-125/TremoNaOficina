@@ -8,255 +8,255 @@ const ADD_COOLDOWN = 1500;
 
 // ─── Alfabeto LGP oficial (APS) ───────────────────────────────────────────────
 const LGP_ALPHABET = [
-  { letter:'A', desc:'Punho fechado, polegar ao lado do indicador (não por cima)' },
-  { letter:'B', desc:'4 dedos estendidos e juntos para cima, polegar dobrado para dentro' },
-  { letter:'C', desc:'Mão curvada em forma de C, todos os dedos semi-dobrados' },
-  { letter:'D', desc:'Indicador levantado em arco, polegar toca na ponta do médio' },
-  { letter:'E', desc:'Dedos dobrados em garra, polegar toca no PIP do indicador' },
-  { letter:'F', desc:'Polegar + indicador fazem círculo (OK), outros 3 estendidos' },
-  { letter:'G', desc:'Indicador e polegar apontam horizontalmente para o lado' },
-  { letter:'H', desc:'Indicador + médio estendidos e apontados horizontalmente' },
-  { letter:'I', desc:'Só o mindinho estendido, polegar dobrado' },
-  { letter:'J', desc:'Mindinho estendido + polegar para fora' },
-  { letter:'K', desc:'Indicador para cima, médio para o lado, polegar no meio' },
-  { letter:'L', desc:'Polegar horizontal + indicador para cima — forma de L' },
+  { letter:'A', desc:'Punho fechado, polegar encostado ao lado do indicador' },
+  { letter:'B', desc:'Punho fechado, só o polegar levantado para cima (joinha)' },
+  { letter:'C', desc:'Todos os dedos semi-curvados formando um C, polegar em oposição' },
+  { letter:'D', desc:'Indicador levantado, polegar encosta na ponta/base do médio dobrado' },
+  { letter:'E', desc:'Todos os dedos dobrados em garra para a palma' },
+  { letter:'F', desc:'Polegar + indicador em círculo (OK), médio, anelar e mindinho estendidos' },
+  { letter:'G', desc:'Indicador apontado para o lado, polegar paralelo — forma de pistola deitada' },
+  { letter:'H', desc:'Indicador + médio estendidos e apontados horizontalmente para o lado' },
+  { letter:'I', desc:'Só o mindinho estendido para cima, polegar e outros dedos fechados' },
+  { letter:'J', desc:'Polegar + mindinho estendidos (shaka / telefone), 3 do meio fechados' },
+  { letter:'K', desc:'Indicador para cima, médio oblíquo para o lado, polegar entre os dois' },
+  { letter:'L', desc:'Indicador para cima + polegar para o lado — forma de L' },
   { letter:'M', desc:'Indicador, médio e anelar dobrados sobre o polegar' },
   { letter:'N', desc:'Indicador e médio dobrados sobre o polegar' },
   { letter:'O', desc:'Todos os dedos curvados a tocar no polegar — forma de O' },
-  { letter:'P', desc:'Indicador aponta para baixo, polegar para fora, mão inclinada' },
-  { letter:'Q', desc:'Indicador e polegar apontam para baixo juntos' },
-  { letter:'R', desc:'Indicador e médio cruzados e estendidos para cima' },
-  { letter:'S', desc:'Punho fechado, polegar por cima dos dedos' },
-  { letter:'T', desc:'Punho fechado com polegar espetado entre indicador e médio' },
-  { letter:'U', desc:'Indicador + médio juntos e estendidos para cima' },
-  { letter:'V', desc:'Indicador + médio estendidos em V aberto' },
-  { letter:'W', desc:'Indicador, médio e anelar estendidos e separados (W)' },
-  { letter:'X', desc:'Indicador dobrado em gancho, outros fechados' },
-  { letter:'Y', desc:'Polegar + mindinho estendidos, outros fechados (Y)' },
-  { letter:'Z', desc:'Indicador estendido — desenha um Z no ar' },
+  { letter:'P', desc:'Mão inclinada, indicador aponta para baixo, polegar para o lado' },
+  { letter:'Q', desc:'Indicador + polegar apontam para baixo juntos — pinça para baixo' },
+  { letter:'R', desc:'Indicador + médio cruzados/entrelaçados e estendidos para cima' },
+  { letter:'S', desc:'Punho fechado, polegar dobrado por cima dos outros dedos' },
+  { letter:'T', desc:'Punho fechado, polegar espetado entre o indicador e o médio' },
+  { letter:'U', desc:'Indicador + médio juntos e estendidos para cima (sem separação)' },
+  { letter:'V', desc:'Indicador + médio estendidos em V aberto (tesoura / paz)' },
+  { letter:'W', desc:'Indicador, médio e anelar estendidos e separados — forma de W' },
+  { letter:'X', desc:'Indicador dobrado em gancho, restantes fechados' },
+  { letter:'Y', desc:'Polegar + mindinho estendidos (shaka), 3 do meio fechados' },
+  { letter:'Z', desc:'Indicador estendido para cima, faz o traço do Z no ar' },
 ];
 
 // ─── SVGs baseados na imagem oficial APS ─────────────────────────────────────
 function HandSVG({ letter, highlight }) {
-  const sk = '#f0c090';   // pele
-  const sd = '#d4956a';   // sombra
-  const ac = highlight ? '#ff6b00' : '#ffaa00'; // cor de destaque
-  const wh = '#fff';
+  const sk = '#f0c090';
+  const sd = '#d4956a';
+  const ac = highlight ? '#ff6b00' : '#ffaa00';
 
   const shapes = {
 
-    // A — punho, polegar ao lado
+    // A — punho fechado, polegar ao lado do indicador
     A: <g>
-      <rect x="22" y="32" width="36" height="34" rx="8" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[26,34,42,50].map((x,i)=><rect key={i} x={x} y={24-i} width="8" height={14+i} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="17" cy="44" rx="5" ry="8" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(10 17 44)"/>
+      <rect x="20" y="34" width="40" height="32" rx="9" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[23,31,40,49].map((x,i)=><rect key={i} x={x} y={22} width="9" height={16} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <rect x="13" y="38" width="10" height="16" rx="5" fill={sk} stroke={sd} strokeWidth="1.2"/>
     </g>,
 
-    // B — 4 dedos juntos para cima, polegar dobrado
+    // B — joinha: punho fechado, só polegar para cima
     B: <g>
-      <rect x="22" y="46" width="38" height="26" rx="8" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[24,32,40,48].map((x,i)=><rect key={i} x={x} y={10} width="8" height={36+i} rx="4" fill={ac} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="19" cy="52" rx="5" ry="9" fill={sk} stroke={sd} strokeWidth="1"/>
+      <rect x="22" y="42" width="38" height="30" rx="9" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[25,34,43,52].map((x,i)=><rect key={i} x={x} y={34} width="8" height={12} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <rect x="14" y="14" width="10" height="32" rx="5" fill={ac} stroke={sd} strokeWidth="1.2"/>
     </g>,
 
-    // C — mão em C
+    // C — mão em arco de C
     C: <g>
-      <path d="M62 20 Q28 10 18 40 Q12 58 28 70 Q44 78 62 70"
-        fill="none" stroke={ac} strokeWidth="13" strokeLinecap="round"/>
-      <path d="M62 20 Q28 10 18 40 Q12 58 28 70 Q44 78 62 70"
-        fill="none" stroke={sk} strokeWidth="8" strokeLinecap="round"/>
+      <path d="M65 18 Q30 8 18 38 Q10 58 26 70 Q42 80 65 72"
+        fill="none" stroke={sd} strokeWidth="15" strokeLinecap="round"/>
+      <path d="M65 18 Q30 8 18 38 Q10 58 26 70 Q42 80 65 72"
+        fill="none" stroke={sk} strokeWidth="11" strokeLinecap="round"/>
+      <path d="M65 18 Q30 8 18 38 Q10 58 26 70 Q42 80 65 72"
+        fill="none" stroke={ac} strokeWidth="2" strokeLinecap="round" strokeDasharray="4 3" opacity="0.7"/>
     </g>,
 
-    // D — indicador curvado para cima, polegar toca no médio
+    // D — indicador levantado, polegar toca no médio dobrado
     D: <g>
-      <ellipse cx="40" cy="54" rx="20" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <path d="M30 50 Q28 28 36 18 Q44 10 46 26 Q48 40 36 46" fill={ac} stroke={sd} strokeWidth="1"/>
-      {[41,50,57].map((x,i)=><rect key={i} x={x} y={36+i*2} width="7" height={18-i*2} rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="22" cy="46" rx="5" ry="9" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(20 22 46)"/>
+      <ellipse cx="42" cy="55" rx="20" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="28" y="14" width="9" height="40" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      {[38,47,55].map((x,i)=><rect key={i} x={x} y={36+i*3} width="8" height={18-i*3} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="20" cy="48" rx="6" ry="10" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(25 20 48)"/>
     </g>,
 
-    // E — garra, polegar toca PIP
+    // E — garra: todos os dedos dobrados para a palma
     E: <g>
-      <ellipse cx="40" cy="54" rx="20" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[[26,30],[34,26],[43,28],[52,31]].map(([x,y],i)=>
-        <path key={i} d={`M${x} ${y} Q${x-2} ${y+10} ${x+4} ${y+18}`}
-          fill="none" stroke={ac} strokeWidth="7" strokeLinecap="round"/>
+      <ellipse cx="40" cy="55" rx="21" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[[24,26],[33,24],[42,25],[51,28]].map(([x,y],i)=>
+        <path key={i} d={`M${x} ${y} Q${x} ${y+14} ${x+5} ${y+20}`}
+          fill="none" stroke={ac} strokeWidth="8" strokeLinecap="round"/>
       )}
-      <ellipse cx="20" cy="46" rx="5" ry="8" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(25 20 46)"/>
+      <ellipse cx="18" cy="50" rx="6" ry="9" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(20 18 50)"/>
     </g>,
 
-    // F — OK: polegar+indicador círculo, 3 estendidos
+    // F — OK: polegar+indicador em círculo, 3 dedos estendidos
     F: <g>
-      <ellipse cx="40" cy="55" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <circle cx="32" cy="38" r="8" fill="none" stroke={ac} strokeWidth="5"/>
-      {[40,49,57].map((x,i)=><rect key={i} x={x} y={14+i*3} width="7" height={38-i*3} rx="3.5" fill={ac} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="42" cy="56" rx="19" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <circle cx="30" cy="40" r="9" fill="none" stroke={ac} strokeWidth="6"/>
+      {[41,50,58].map((x,i)=><rect key={i} x={x} y={12+i*4} width="8" height={40-i*4} rx="4" fill={ac} stroke={sd} strokeWidth="1"/>)}
     </g>,
 
-    // G — indicador horizontal para o lado
+    // G — indicador horizontal para o lado, polegar paralelo
     G: <g>
-      <ellipse cx="42" cy="52" rx="18" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="16" y="36" width="32" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <rect x="10" y="42" width="14" height="7" rx="3.5" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-20 17 46)"/>
-      {[42,51,58].map((x,i)=><rect key={i} x={x} y={36+i*2} width="7" height={14-i*2} rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="44" cy="54" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="10" y="34" width="38" height="9" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="10" y="46" width="20" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
+      {[44,52,59].map((x,i)=><rect key={i} x={x} y={38} width="8" height="14" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
     </g>,
 
-    // H — 2 dedos horizontais
+    // H — indicador + médio horizontais paralelos
     H: <g>
-      <ellipse cx="42" cy="54" rx="18" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="14" y="30" width="34" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <rect x="14" y="40" width="34" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      {[46,54].map((x,i)=><rect key={i} x={x} y={36} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="20" cy="50" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
+      <ellipse cx="44" cy="54" rx="18" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="10" y="30" width="38" height="9" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="10" y="42" width="38" height="9" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      {[50,58].map((x,i)=><rect key={i} x={x} y={36} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
     </g>,
 
-    // I — só mindinho
+    // I — só mindinho estendido
     I: <g>
-      <ellipse cx="40" cy="54" rx="20" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[24,33,42].map((x,i)=><rect key={i} x={x} y={38} width="8" height="16" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <rect x="52" y="18" width="7" height="34" rx="3.5" fill={ac} stroke={sd} strokeWidth="1"/>
-      <ellipse cx="20" cy="50" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
+      <ellipse cx="40" cy="55" rx="21" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[20,29,38].map((x,i)=><rect key={i} x={x} y={38} width="8" height="15" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <rect x="50" y="14" width="9" height="40" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="16" y="40" width="8" height="13" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>
     </g>,
 
-    // J — mindinho + polegar para fora
+    // J — shaka: polegar + mindinho abertos
     J: <g>
-      <ellipse cx="40" cy="54" rx="20" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[24,33,42].map((x,i)=><rect key={i} x={x} y={38} width="8" height="16" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <rect x="52" y="18" width="7" height="34" rx="3.5" fill={ac} stroke={sd} strokeWidth="1"/>
-      <ellipse cx="16" cy="50" rx="5" ry="9" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-10 16 50)"/>
+      <ellipse cx="40" cy="54" rx="20" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[28,37,46].map((x,i)=><rect key={i} x={x} y={38} width="8" height="14" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <rect x="56" y="14" width="9" height="38" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="12" y="12" width="10" height="36" rx="5" fill={ac} stroke={sd} strokeWidth="1.2" transform="rotate(-15 17 30)"/>
     </g>,
 
-    // K — indicador cima, médio lado, polegar meio
+    // K — indicador cima, médio oblíquo, polegar no meio
     K: <g>
-      <ellipse cx="40" cy="56" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="28" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <rect x="38" y="28" width="8" height="26" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(20 42 40)"/>
-      {[49,56].map((x,i)=><rect key={i} x={x} y={38+i*2} width="7" height={18-i*2} rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="22" cy="42" rx="5" ry="9" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(15 22 42)"/>
+      <ellipse cx="42" cy="57" rx="19" ry="17" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="26" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="36" y="22" width="8" height="34" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(22 40 38)"/>
+      {[51,59].map((x,i)=><rect key={i} x={x} y={40+i*2} width="7" height="15" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="20" cy="42" rx="6" ry="10" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(18 20 42)"/>
     </g>,
 
-    // L — L maiúsculo
+    // L — indicador para cima, polegar para o lado: forma de L
     L: <g>
-      <ellipse cx="42" cy="55" rx="17" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="34" y="12" width="8" height="42" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <rect x="14" y="48" width="26" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      {[43,51].map((x,i)=><rect key={i} x={x} y={36+i*3} width="7" height={20-i*3} rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="43" cy="56" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="32" y="10" width="9" height="46" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="10" y="50" width="28" height="9" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      {[43,51].map((x,i)=><rect key={i} x={x} y={38+i*3} width="8" height="18" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
     </g>,
 
-    // M — 3 dedos sobre polegar
+    // M — 3 dedos (ind+med+anel) dobrados sobre o polegar
     M: <g>
-      <ellipse cx="40" cy="52" rx="20" ry="22" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[24,33,42].map((x,i)=><rect key={i} x={x} y={30+i} width="8" height="18" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>)}
-      <rect x="52" y="36" width="7" height="14" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>
-      <ellipse cx="32" cy="50" rx="12" ry="5" fill={sd} opacity="0.3"/>
-      <ellipse cx="20" cy="44" rx="6" ry="9" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(30 20 44)"/>
+      <ellipse cx="40" cy="53" rx="22" ry="21" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[22,31,40].map((x,i)=><rect key={i} x={x} y={32} width="8" height="20" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>)}
+      <rect x="50" y="38" width="8" height="14" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>
+      <ellipse cx="18" cy="46" rx="7" ry="10" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(28 18 46)"/>
+      <ellipse cx="34" cy="52" rx="14" ry="4" fill={sd} opacity="0.25"/>
     </g>,
 
-    // N — 2 dedos sobre polegar
+    // N — ind+médio dobrados sobre polegar
     N: <g>
-      <ellipse cx="40" cy="52" rx="20" ry="22" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[26,35].map((x,i)=><rect key={i} x={x} y={30+i} width="8" height="18" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>)}
-      {[44,52].map((x,i)=><rect key={i} x={x} y={36+i} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="20" cy="44" rx="6" ry="9" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(30 20 44)"/>
+      <ellipse cx="40" cy="53" rx="22" ry="21" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[24,33].map((x,i)=><rect key={i} x={x} y={32} width="8" height="20" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>)}
+      {[43,52].map((x,i)=><rect key={i} x={x} y={38} width="8" height="14" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="18" cy="46" rx="7" ry="10" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(28 18 46)"/>
     </g>,
 
-    // O — círculo com todos os dedos
+    // O — todos os dedos formam um O com o polegar
     O: <g>
-      <ellipse cx="40" cy="52" rx="19" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <ellipse cx="38" cy="34" rx="12" ry="14" fill="none" stroke={ac} strokeWidth="9"/>
-      <ellipse cx="38" cy="34" rx="12" ry="14" fill="none" stroke={sk} strokeWidth="5"/>
+      <ellipse cx="40" cy="53" rx="21" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <ellipse cx="38" cy="35" rx="13" ry="15" fill="none" stroke={sd} strokeWidth="11"/>
+      <ellipse cx="38" cy="35" rx="13" ry="15" fill="none" stroke={sk} strokeWidth="7"/>
+      <ellipse cx="38" cy="35" rx="13" ry="15" fill="none" stroke={ac} strokeWidth="2" strokeDasharray="3 3" opacity="0.8"/>
     </g>,
 
-    // P — indicador para baixo, polegar para fora
+    // P — mão inclinada, indicador para baixo, polegar para o lado
     P: <g>
-      <ellipse cx="40" cy="44" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="32" y="44" width="8" height="28" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <ellipse cx="20" cy="46" rx="5" ry="9" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-10 20 46)"/>
-      {[42,50].map((x,i)=><rect key={i} x={x} y={36} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="40" cy="42" rx="19" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="30" y="42" width="9" height="30" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="13" y="38" width="22" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
+      {[41,50].map((x,i)=><rect key={i} x={x} y={34} width="8" height="16" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
     </g>,
 
-    // Q — indicador e polegar para baixo
+    // Q — pinça para baixo: indicador+polegar apontam para baixo
     Q: <g>
-      <ellipse cx="40" cy="42" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="33" y="42" width="8" height="26" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <ellipse cx="24" cy="52" rx="5" ry="12" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(10 24 52)"/>
-      {[43,51].map((x,i)=><rect key={i} x={x} y={36} width="7" height="14" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="40" cy="42" rx="19" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="32" y="42" width="9" height="28" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="20" y="44" width="14" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(15 27 48)"/>
+      {[43,52].map((x,i)=><rect key={i} x={x} y={34} width="8" height="16" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
     </g>,
 
-    // R — dedos cruzados
+    // R — indicador + médio cruzados para cima
     R: <g>
-      <ellipse cx="40" cy="56" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="30" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(6 34 40)"/>
-      <rect x="38" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-6 42 40)"/>
-      {[50,57].map((x,i)=><rect key={i} x={x} y={38+i*2} width="7" height="18" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="20" cy="52" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
-    </g>,
-
-    // S — punho, polegar por cima
-    S: <g>
-      <rect x="22" y="34" width="36" height="34" rx="8" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[26,34,42,50].map((x,i)=><rect key={i} x={x} y={26-i} width="8" height={12+i} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <rect x="22" y="30" width="24" height="8" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-    </g>,
-
-    // T — polegar entre indicador e médio
-    T: <g>
-      <rect x="22" y="34" width="36" height="34" rx="8" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      {[26,34,42,50].map((x,i)=><rect key={i} x={x} y={26-i} width="8" height={12+i} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="34" cy="32" rx="5" ry="7" fill={ac} stroke={sd} strokeWidth="1"/>
-    </g>,
-
-    // U — 2 dedos juntos para cima
-    U: <g>
-      <ellipse cx="40" cy="56" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="28" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <rect x="37" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      {[47,54].map((x,i)=><rect key={i} x={x} y={38+i*2} width="7" height="18" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="20" cy="52" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
-    </g>,
-
-    // V — V aberto
-    V: <g>
-      <ellipse cx="40" cy="56" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="24" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-8 28 50)"/>
-      <rect x="42" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(8 46 50)"/>
-      {[51,58].map((x,i)=><rect key={i} x={x} y={38+i*2} width="7" height="18" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="40" cy="57" rx="19" ry="17" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="28" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(7 32 38)"/>
+      <rect x="38" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-7 42 38)"/>
+      {[51,59].map((x,i)=><rect key={i} x={x} y={40} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
       <ellipse cx="18" cy="52" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
     </g>,
 
-    // W — 3 dedos espalhados
-    W: <g>
-      <ellipse cx="40" cy="57" rx="20" ry="17" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="22" y="14" width="7" height="42" rx="3.5" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-6 26 48)"/>
-      <rect x="33" y="12" width="8" height="44" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      <rect x="44" y="14" width="7" height="42" rx="3.5" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(6 48 48)"/>
-      <rect x="54" y="30" width="7" height="24" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>
+    // S — punho fechado, polegar por cima dos dedos
+    S: <g>
+      <rect x="20" y="34" width="42" height="34" rx="9" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[23,32,41,50].map((x,i)=><rect key={i} x={x} y={24} width="8" height={14} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <rect x="18" y="28" width="30" height="10" rx="5" fill={ac} stroke={sd} strokeWidth="1.2"/>
+    </g>,
+
+    // T — punho, polegar espetado entre indicador e médio
+    T: <g>
+      <rect x="20" y="34" width="42" height="34" rx="9" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[23,32,41,50].map((x,i)=><rect key={i} x={x} y={24} width="8" height={14} rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="32" cy="30" rx="6" ry="8" fill={ac} stroke={sd} strokeWidth="1.2"/>
+    </g>,
+
+    // U — indicador + médio juntos para cima (sem separação)
+    U: <g>
+      <ellipse cx="40" cy="57" rx="19" ry="17" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="27" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="37" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      {[48,56].map((x,i)=><rect key={i} x={x} y={40} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="18" cy="52" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
+    </g>,
+
+    // V — indicador + médio em V aberto (tesoura)
+    V: <g>
+      <ellipse cx="40" cy="57" rx="19" ry="17" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="22" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-10 26 50)"/>
+      <rect x="43" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(10 47 50)"/>
+      {[52,60].map((x,i)=><rect key={i} x={x} y={40} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
       <ellipse cx="16" cy="52" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
     </g>,
 
-    // X — gancho
+    // W — 3 dedos estendidos e separados
+    W: <g>
+      <ellipse cx="40" cy="58" rx="21" ry="16" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="18" y="12" width="8" height="44" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-8 22 50)"/>
+      <rect x="32" y="10" width="9" height="46" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="46" y="12" width="8" height="44" rx="4" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(8 50 50)"/>
+      <rect x="57" y="34" width="7" height="22" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>
+      <ellipse cx="13" cy="53" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
+    </g>,
+
+    // X — indicador dobrado em gancho
     X: <g>
-      <ellipse cx="40" cy="54" rx="20" ry="20" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <path d="M34 36 Q30 24 36 18 Q44 14 44 26 Q44 38 34 38" fill={ac} stroke={sd} strokeWidth="1"/>
-      {[42,50,57].map((x,i)=><rect key={i} x={x} y={36+i*2} width="7" height="18" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
-      <ellipse cx="20" cy="50" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
+      <ellipse cx="40" cy="55" rx="21" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <path d="M32 42 Q28 28 34 18 Q42 10 44 24 Q46 38 34 42" fill={ac} stroke={sd} strokeWidth="1.2"/>
+      {[44,52,60].map((x,i)=><rect key={i} x={x} y={38+i*2} width="7" height="17" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="18" cy="50" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
     </g>,
 
-    // Y — polegar + mindinho
+    // Y — polegar + mindinho abertos (shaka)
     Y: <g>
-      <ellipse cx="40" cy="54" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="54" y="18" width="7" height="34" rx="3.5" fill={ac} stroke={sd} strokeWidth="1"/>
-      <ellipse cx="16" cy="48" rx="5" ry="12" fill={ac} stroke={sd} strokeWidth="1" transform="rotate(-15 16 48)"/>
-      {[30,38,46].map((x,i)=><rect key={i} x={x} y={38} width="7" height="14" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="40" cy="54" rx="19" ry="19" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      {[28,36,44].map((x,i)=><rect key={i} x={x} y={38} width="8" height="14" rx="4" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <rect x="54" y="12" width="9" height="40" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      <rect x="12" y="12" width="10" height="38" rx="5" fill={ac} stroke={sd} strokeWidth="1.2" transform="rotate(-18 17 30)"/>
     </g>,
 
-    // Z — indicador estendido (desenha Z)
+    // Z — indicador estendido para cima (traça Z no ar)
     Z: <g>
-      <ellipse cx="40" cy="56" rx="18" ry="18" fill={sk} stroke={sd} strokeWidth="1.2"/>
-      <rect x="30" y="14" width="8" height="40" rx="4" fill={ac} stroke={sd} strokeWidth="1"/>
-      {[40,49,56].map((x,i)=><rect key={i} x={x} y={38+i*2} width="7" height="18" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
+      <ellipse cx="40" cy="57" rx="19" ry="17" fill={sk} stroke={sd} strokeWidth="1.2"/>
+      <rect x="30" y="12" width="9" height="44" rx="4.5" fill={ac} stroke={sd} strokeWidth="1"/>
+      {[41,50,58].map((x,i)=><rect key={i} x={x} y={40+i*2} width="7" height="16" rx="3.5" fill={sk} stroke={sd} strokeWidth="1"/>)}
       <ellipse cx="18" cy="52" rx="5" ry="8" fill={sk} stroke={sd} strokeWidth="1"/>
-      {/* Z tracejado */}
-      <path d="M48 18 L60 18 L48 30 L60 30" fill="none" stroke={wh} strokeWidth="2" strokeLinecap="round" opacity="0.7"/>
+      <path d="M44 16 L58 16 L44 28 L58 28" fill="none" stroke={ac} strokeWidth="2.5" strokeLinecap="round" opacity="0.8"/>
     </g>,
   };
 
