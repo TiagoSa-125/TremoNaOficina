@@ -1,0 +1,63 @@
+:root {
+  --bg: #0a0a0f;
+  --bg2: #12121a;
+  --bg3: #1a1a26;
+  --border: #2a2a3e;
+  --accent: #ff6b00;
+  --accent2: #ffaa00;
+  --green: #39ff14;
+  --yellow: #ffd700;
+  --red: #ff2244;
+  --gray: #3a3a5c;
+  --text: #e8e8f0;
+  --text2: #8888aa;
+  --font-title: 'Black Ops One', cursive;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-body: 'Rajdhani', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255,107,0,0.015) 2px,
+      rgba(255,107,0,0.015) 4px
+    );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+}
