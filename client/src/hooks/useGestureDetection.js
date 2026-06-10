@@ -216,7 +216,7 @@ export function detectLGPLetter(lm) {
     if (idxDown && thumbDown && !thumbOut) return 'Q';
   }
 
-// ── R: indicador inclinado para a frente, médio reto, polegar a apoiar o indicador
+  // ── R: indicador inclinado para a frente, médio reto, polegar a apoiar o indicador
   // Imagem APS: indicador apontado para a frente/baixo (não totalmente vertical),
   // médio bem vertical, polegar encostado por baixo do indicador como apoio
   if (iUp && mUp && !rUp && !pUp) {
@@ -258,7 +258,7 @@ export function detectLGPLetter(lm) {
     return 'W';
   }
 
-// ── X: indicador + médio entrelaçados/cruzados, ambos para cima ───────────
+  // ── X: indicador + médio entrelaçados/cruzados, ambos para cima ───────────
   // Imagem APS: dois dedos cruzados um sobre o outro, apontando para cima
   if (iUp && mUp && !rUp && !pUp) {
     const crossedX = Math.abs(iTip.x - mTip.x) < 0.025;
