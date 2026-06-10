@@ -216,11 +216,13 @@ export function detectLGPLetter(lm) {
     if (idxDown && thumbDown && !thumbOut) return 'Q';
   }
 
-  // ── R: indicador + médio cruzados ────────────────────────────────────────
-  // Imagem APS: dois dedos entrelaçados para cima
+// ── R: indicador inclinado para a frente, médio reto, polegar a apoiar o indicador
+  // Imagem APS: indicador apontado para a frente/baixo (não totalmente vertical),
+  // médio bem vertical, polegar encostado por baixo do indicador como apoio
   if (iUp && mUp && !rUp && !pUp) {
-    const crossed = Math.abs(iTip.x - mTip.x) < 0.03;
-    if (crossed && !touching(thumbTip, mPIP, 0.10)) return 'R';
+    const indexLeansForward = (iTip.y - iMCP.y) > (mTip.y - mMCP.y) + 0.02; // indicador menos vertical que médio
+    const thumbSupports = touching(thumbTip, iPIP, 0.09) || touching(thumbTip, iMCP, 0.09);
+    if (indexLeansForward && thumbSupports) return 'R';
   }
 
   // ── S: punho fechado, polegar por cima dos dedos ─────────────────────────
@@ -256,11 +258,11 @@ export function detectLGPLetter(lm) {
     return 'W';
   }
 
-  // ── X: indicador dobrado em gancho ───────────────────────────────────────
-  // Imagem APS: indicador curvado, restantes fechados
-  if (!iUp && !mUp && !rUp && !pUp) {
-    const hook = lm[8].y > lm[7].y + 0.01 && lm[7].y < lm[6].y && lm[8].y < lm[5].y + 0.04;
-    if (hook) return 'X';
+// ── X: indicador + médio entrelaçados/cruzados, ambos para cima ───────────
+  // Imagem APS: dois dedos cruzados um sobre o outro, apontando para cima
+  if (iUp && mUp && !rUp && !pUp) {
+    const crossedX = Math.abs(iTip.x - mTip.x) < 0.025;
+    if (crossedX) return 'X';
   }
 
   // ── Y: polegar + mindinho (shaka) ────────────────────────────────────────
