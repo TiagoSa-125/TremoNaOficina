@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Camera from './components/Camera';
+import TrainingMode from './components/TrainingMode';
 import { useGame } from './hooks/useGame';
 
 // ─────────────────────────────────────────────
 //  ECRÃ DE MENU INICIAL
 // ─────────────────────────────────────────────
-function MenuScreen({ onPlay }) {
+function MenuScreen({ onPlay, onTrain }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -62,6 +63,14 @@ function MenuScreen({ onPlay }) {
           onClick={onPlay}
         >
           <span style={m.playBtnText}>▶ JOGAR</span>
+        </button>
+
+        {/* Botão TREINO */}
+        <button
+          style={m.trainBtn}
+          onClick={onTrain}
+        >
+          🎓 Modo de Treino (gestos)
         </button>
 
         {/* Legenda rápida */}
@@ -374,14 +383,15 @@ function GameScreen({ onBack }) {
 //  ROOT — controla qual ecrã está ativo
 // ─────────────────────────────────────────────
 export default function App() {
-  const [screen, setScreen] = useState('menu'); // 'menu' | 'game'
+  const [screen, setScreen] = useState('menu'); // 'menu' | 'game' | 'train'
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0f' }}>
-      {screen === 'menu'
-        ? <MenuScreen onPlay={() => setScreen('game')} />
-        : <GameScreen onBack={() => setScreen('menu')} />
-      }
+      {screen === 'menu' && (
+        <MenuScreen onPlay={() => setScreen('game')} onTrain={() => setScreen('train')} />
+      )}
+      {screen === 'game' && <GameScreen onBack={() => setScreen('menu')} />}
+      {screen === 'train' && <TrainingMode onBack={() => setScreen('menu')} />}
     </div>
   );
 }
@@ -485,6 +495,19 @@ const m = {
     fontSize: '1.4rem',
     color: '#000',
     letterSpacing: '0.15em',
+  },
+  trainBtn: {
+    marginTop: '14px',
+    padding: '10px 28px',
+    background: 'transparent',
+    border: '1.5px solid #ffaa00',
+    borderRadius: '50px',
+    color: '#ffaa00',
+    fontFamily: 'system-ui, sans-serif',
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    letterSpacing: '0.05em',
   },
   legend: {
     display: 'flex',

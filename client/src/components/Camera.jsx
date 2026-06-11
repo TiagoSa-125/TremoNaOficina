@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { detectLGPLetter, GestureSmoothing } from '../hooks/useGestureDetection';
+import { KNNClassifier, GestureSmoothing, loadTrainingData } from '../hooks/useKNNClassifier';
 
 const smoother = new GestureSmoothing(15, 0.6);
 let lastAddedLetter = null;
 let lastAddTime = 0;
 const ADD_COOLDOWN = 1500;
+const CONFIDENCE_THRESHOLD = 0.5; // confiança mínima do k-NN para considerar válido
 
 // ─── Alfabeto LGP oficial (APS) ───────────────────────────────────────────────
 const LGP_ALPHABET = [
@@ -317,6 +318,9 @@ export default function Camera({ onLetterDetected, active, currentGuessLength, w
   const [panelOpen, setPanelOpen]         = useState(false);
   const [selectedLetter, setSelectedLetter] = useState('A');
   const [searchLetter, setSearchLetter]   = useState('');
+  const [trainingCount, setTrainingCount] = useState(0);
+
+  const classifierRef = useRef(null);
 
   const filtered = LGP_ALPHABET.filter(i =>
     searchLetter === '' || i.letter === searchLetter.toUpperCase()
@@ -329,6 +333,17 @@ export default function Camera({ onLetterDetected, active, currentGuessLength, w
     wordLengthRef.current = wordLength;
     onLetterDetectedRef.current = onLetterDetected;
   }, [active, currentGuessLength, wordLength, onLetterDetected]);
+
+  // ── Carregar dados de treino e construir o classificador k-NN ────────────
+  useEffect(() => {
+    let mounted = true;
+    loadTrainingData().then(data => {
+      if (!mounted) return;
+      classifierRef.current = new KNNClassifier(data, 5, 1.4);
+      setTrainingCount(data.length);
+    });
+    return () => { mounted = false; };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -362,7 +377,11 @@ export default function Camera({ onLetterDetected, active, currentGuessLength, w
             drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#ff6b00', lineWidth: 2 });
             drawLandmarks(ctx, lm, { color: '#ffaa00', lineWidth: 1, radius: 3 });
 
-            const raw = detectLGPLetter(lm);
+            let raw = null;
+            if (classifierRef.current && classifierRef.current.size > 0) {
+              const { letter: predicted, confidence } = classifierRef.current.predict(lm);
+              raw = confidence >= CONFIDENCE_THRESHOLD ? predicted : null;
+            }
             const { letter, progress: prog } = smoother.update(raw);
             setDetectedLetter(letter);
             setProgress(prog);
@@ -471,8 +490,13 @@ export default function Camera({ onLetterDetected, active, currentGuessLength, w
             {/* Status */}
             <div style={s.status}>
               <span style={{...s.dot, background: detectedLetter ? '#ff6b00' : '#39ff14'}}/>
-              <span style={s.statusTxt}>{status}</span>
+              <span style={s.statusTxt}>
+                {trainingCount === 0
+                  ? '⚠️ Sem dados de treino — vai a /lgp-training-data.json'
+                  : status}
+              </span>
             </div>
+
 
             {/* Botão toggle painel */}
             <button
