@@ -158,13 +158,36 @@ function GameScreen({ onBack }) {
     }
   }, [gameStatus]);
 
+  // Letras a mostrar nos slots: combina letras confirmadas (de tentativas
+  // anteriores, em posições corretas) com a tentativa atual.
+  // currentGuess preenche as posições que NÃO estão confirmadas.
+  const displayLetters = (() => {
+    const result = [];
+    let cgIndex = 0;
+    for (let i = 0; i < wordLength; i++) {
+      if (confirmedLetters[i]) {
+        result.push(confirmedLetters[i]);
+      } else {
+        result.push(currentGuess[cgIndex] || '');
+        cgIndex++;
+      }
+    }
+    return result;
+  })();
+
+  // Número de posições ainda não confirmadas (as que o jogador precisa de preencher)
+  const slotsToFill = [0, 1, 2, 3].filter(i => !confirmedLetters[i]).length;
+
+  // Tentativa "completa" combinando confirmadas + atuais, na ordem certa
+  const fullGuess = displayLetters.join('');
+
   const handleSubmit = useCallback(() => {
-    if (currentGuess.length < wordLength) {
+    if (currentGuess.length < slotsToFill) {
       showToast('Precisa de 4 letras!');
       return;
     }
-    submitGuess();
-  }, [currentGuess, wordLength, submitGuess, showToast]);
+    submitGuess(fullGuess);
+  }, [currentGuess, slotsToFill, fullGuess, submitGuess, showToast]);
 
   // Teclado físico — apenas confirmar (Enter) e apagar (Backspace).
   // As letras só podem ser introduzidas por gestos LGP na câmara.
@@ -178,16 +201,18 @@ function GameScreen({ onBack }) {
     return () => window.removeEventListener('keydown', h);
   }, [handleSubmit, deleteLetter]);
 
-  // Submeter automaticamente quando a palavra atinge o comprimento exigido
-  // (necessário para o fluxo por câmara/gestos, que não dispara Enter)
+  // Submeter automaticamente quando todas as posições (confirmadas + novas)
+  // estiverem preenchidas (necessário para o fluxo por câmara/gestos, que
+  // não dispara Enter)
   useEffect(() => {
     if (gameStatus !== 'playing') return;
-    if (currentGuess.length !== wordLength) return;
+    if (currentGuess.length !== slotsToFill) return;
+    if (slotsToFill === 0) return; // nada para preencher (não deve acontecer)
     const t = setTimeout(() => {
-      submitGuess();
-    }, 350); // pequena pausa para o utilizador ver a 4ª letra preenchida
+      submitGuess(fullGuess);
+    }, 350); // pequena pausa para o utilizador ver a última letra preenchida
     return () => clearTimeout(t);
-  }, [currentGuess, wordLength, gameStatus, submitGuess]);
+  }, [currentGuess, slotsToFill, fullGuess, gameStatus, submitGuess]);
 
   const handleReset = useCallback(() => {
     setConfirmedLetters([null, null, null, null]);
@@ -196,13 +221,6 @@ function GameScreen({ onBack }) {
     setLastGuessResult(null);
     resetGame();
   }, [resetGame]);
-
-  // Letras a mostrar nos slots: confirmadas > currentGuess > vazio
-  const displayLetters = [0, 1, 2, 3].map(i => {
-    if (confirmedLetters[i]) return confirmedLetters[i];
-    if (currentGuess[i]) return currentGuess[i];
-    return '';
-  });
 
   // Cor de cada slot
   const slotColor = (i) => {
