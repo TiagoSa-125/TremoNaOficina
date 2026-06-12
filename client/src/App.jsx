@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Camera from './components/Camera';
 import TrainingMode from './components/TrainingMode';
 import { useGame } from './hooks/useGame';
@@ -20,42 +20,29 @@ function MenuScreen({ onPlay, onTrain }) {
           0%   { top: -10%; }
           100% { top: 110%; }
         }
-        @keyframes blink {
-          0%,100% { opacity: 1; }
-          50%      { opacity: 0; }
-        }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(30px); }
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
-      {/* Scanline animada */}
       <div style={m.scanline} />
-
-      {/* Grid de fundo */}
       <div style={m.grid} />
 
-      {/* Conteúdo central */}
       <div style={m.content}>
-
-        {/* Ícone de mão a flutuar */}
         <div style={m.handIcon}>🤟</div>
 
-        {/* Título */}
         <div style={m.titleBlock}>
           <h1 style={m.title}>TREMU</h1>
           <p style={m.subtitle}>NA OFICINA</p>
           <div style={m.titleLine} />
         </div>
 
-        {/* Descrição */}
         <p style={m.desc}>
           Adivinha palavras de <strong style={{ color: '#ff6b00' }}>4 letras</strong><br />
           usando <strong style={{ color: '#ffaa00' }}>Linguagem Gestual Portuguesa</strong>
         </p>
 
-        {/* Botão JOGAR */}
         <button
           style={{ ...m.playBtn, ...(hovered ? m.playBtnHover : {}) }}
           onMouseEnter={() => setHovered(true)}
@@ -65,15 +52,17 @@ function MenuScreen({ onPlay, onTrain }) {
           <span style={m.playBtnText}>▶ JOGAR</span>
         </button>
 
-        {/* Botão TREINO */}
-        <button
-          style={m.trainBtn}
-          onClick={onTrain}
-        >
+        {/* ══════════════════════════════════════════════════════════════
+            BOTÃO MODO DE TREINO
+            → ESCONDIDO: está comentado abaixo
+            → Para MOSTRAR: apaga  {/*  TREINO-START  e  TREINO-END  *\/}
+        ══════════════════════════════════════════════════════════════ */}
+        {/* TREINO-START
+        <button style={m.trainBtn} onClick={onTrain}>
           🎓 Modo de Treino (gestos)
         </button>
+        TREINO-END */}
 
-        {/* Legenda rápida */}
         <div style={m.legend}>
           <div style={m.legendRow}>
             <span style={{ ...m.legendDot, background: '#39ff14' }} />
@@ -89,7 +78,6 @@ function MenuScreen({ onPlay, onTrain }) {
           </div>
         </div>
 
-        {/* Rodapé */}
         <p style={m.footer}>6 tentativas • Alfabeto Manual LGP</p>
       </div>
     </div>
@@ -101,44 +89,42 @@ function MenuScreen({ onPlay, onTrain }) {
 // ─────────────────────────────────────────────
 function GameScreen({ onBack }) {
   const {
-    guesses, currentGuess, gameStatus, loading,
+    guesses, currentGuess, gameStatus,
     addLetter, deleteLetter, submitGuess, resetGame,
     wordLength, targetWord,
   } = useGame();
 
-  // Estado de feedback por slot (null | 'correct' | 'wrong' | 'absent')
-  const [slotFeedback, setSlotFeedback] = useState([null, null, null, null]);
-  const [showFeedback, setShowFeedback] = useState(false);
-  // Letras confirmadas que ficam permanentemente
+  const [slotFeedback, setSlotFeedback]         = useState([null, null, null, null]);
+  const [showFeedback, setShowFeedback]         = useState(false);
   const [confirmedLetters, setConfirmedLetters] = useState([null, null, null, null]);
-  const [toast, setToast] = useState('');
-  const [lastGuessResult, setLastGuessResult] = useState(null);
+  const [toast, setToast]                       = useState('');
+
+  // ─── REF para acesso síncrono ao valor mais recente de confirmedLetters ───
+  // Resolve a race condition onde o auto-submit lia o valor desatualizado do closure
+  const confirmedRef = useRef([null, null, null, null]);
 
   const showToast = useCallback((msg, dur = 2200) => {
     setToast(msg);
     setTimeout(() => setToast(''), dur);
   }, []);
 
-  // Quando muda guesses (nova tentativa submetida), calcular feedback
+  // Quando uma nova tentativa é submetida: feedback visual + fixar letras verdes
   useEffect(() => {
     if (guesses.length === 0) return;
     const last = guesses[guesses.length - 1];
-    setLastGuessResult(last);
 
-    // feedback visual por posição
-    const fb = last.evaluation.map(e => e); // 'correct' | 'present' | 'absent'
-    setSlotFeedback(fb);
+    setSlotFeedback(last.evaluation.map(e => e));
     setShowFeedback(true);
 
-    // Letras corretas ficam confirmadas
-    const newConfirmed = [...confirmedLetters];
+    // Calcular novas letras confirmadas
+    const next = [...confirmedRef.current];
     last.word.split('').forEach((letter, i) => {
-      if (last.evaluation[i] === 'correct') newConfirmed[i] = letter;
+      if (last.evaluation[i] === 'correct') next[i] = letter;
     });
-    setConfirmedLetters(newConfirmed);
+    // Atualizar tanto a ref (síncrono) como o state (para re-render)
+    confirmedRef.current = next;
+    setConfirmedLetters(next);
 
-    // Após 1.2s limpa feedback visual (o toast de vitória/derrota é tratado
-    // separadamente pelo efeito que observa gameStatus)
     const t = setTimeout(() => {
       setShowFeedback(false);
       setSlotFeedback([null, null, null, null]);
@@ -146,7 +132,7 @@ function GameScreen({ onBack }) {
     return () => clearTimeout(t);
   }, [guesses.length]);
 
-  // Mensagens de estado — disparado quando o jogo termina
+  // Mensagens de fim de jogo
   useEffect(() => {
     if (gameStatus === 'won') {
       const t = setTimeout(() => showToast('🏆 ESPETACULAR! GANHOU!', 3500), 1200);
@@ -158,15 +144,17 @@ function GameScreen({ onBack }) {
     }
   }, [gameStatus]);
 
-  // Letras a mostrar nos slots: combina letras confirmadas (de tentativas
-  // anteriores, em posições corretas) com a tentativa atual.
-  // currentGuess preenche as posições que NÃO estão confirmadas.
+  // Slots ainda por preencher (posições não confirmadas como verdes)
+  // Usa confirmedRef para valor sempre atualizado
+  const slotsToFill = [0, 1, 2, 3].filter(i => !confirmedRef.current[i]).length;
+
+  // Letras a mostrar nos 4 slots: verdes fixas + currentGuess nas posições livres
   const displayLetters = (() => {
     const result = [];
     let cgIndex = 0;
     for (let i = 0; i < wordLength; i++) {
-      if (confirmedLetters[i]) {
-        result.push(confirmedLetters[i]);
+      if (confirmedRef.current[i]) {
+        result.push(confirmedRef.current[i]);
       } else {
         result.push(currentGuess[cgIndex] || '');
         cgIndex++;
@@ -175,10 +163,7 @@ function GameScreen({ onBack }) {
     return result;
   })();
 
-  // Número de posições ainda não confirmadas (as que o jogador precisa de preencher)
-  const slotsToFill = [0, 1, 2, 3].filter(i => !confirmedLetters[i]).length;
-
-  // Tentativa "completa" combinando confirmadas + atuais, na ordem certa
+  // Palavra completa: confirmadas + currentGuess nas posições livres
   const fullGuess = displayLetters.join('');
 
   const handleSubmit = useCallback(() => {
@@ -189,42 +174,50 @@ function GameScreen({ onBack }) {
     submitGuess(fullGuess);
   }, [currentGuess, slotsToFill, fullGuess, submitGuess, showToast]);
 
-  // Teclado físico — apenas confirmar (Enter) e apagar (Backspace).
-  // As letras só podem ser introduzidas por gestos LGP na câmara.
+  // Teclado físico: Enter = confirmar, Backspace = apagar
   useEffect(() => {
     const h = (e) => {
       if (e.ctrlKey || e.altKey || e.metaKey) return;
-      if (e.key === 'Enter') handleSubmit();
+      if (e.key === 'Enter')          handleSubmit();
       else if (e.key === 'Backspace') deleteLetter();
     };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
   }, [handleSubmit, deleteLetter]);
 
-  // Submeter automaticamente quando todas as posições (confirmadas + novas)
-  // estiverem preenchidas (necessário para o fluxo por câmara/gestos, que
-  // não dispara Enter)
+  // Auto-submit quando todos os slots livres estão preenchidos por gesto
   useEffect(() => {
     if (gameStatus !== 'playing') return;
-    if (slotsToFill === 0) return; // nada para preencher
-    if (currentGuess.length !== slotsToFill) return;
-    // fullGuess tem SEMPRE 4 letras aqui (confirmadas + currentGuess)
-    const guessSnapshot = fullGuess;
-    const t = setTimeout(() => {
-      submitGuess(guessSnapshot);
-    }, 350); // pequena pausa para o utilizador ver a última letra preenchida
+    // Recalcula slotsToFill com a ref (valor síncrono, sem closure stale)
+    const slots = [0, 1, 2, 3].filter(i => !confirmedRef.current[i]).length;
+    if (slots === 0) return;
+    if (currentGuess.length !== slots) return;
+
+    // Montar fullGuess com a ref atualizada
+    const letters = [];
+    let ci = 0;
+    for (let i = 0; i < 4; i++) {
+      if (confirmedRef.current[i]) {
+        letters.push(confirmedRef.current[i]);
+      } else {
+        letters.push(currentGuess[ci] || '');
+        ci++;
+      }
+    }
+    const snap = letters.join('');
+    const t = setTimeout(() => submitGuess(snap), 350);
     return () => clearTimeout(t);
-  }, [currentGuess.length, slotsToFill, gameStatus]); // eslint-disable-line
+  }, [currentGuess.length, gameStatus]); // eslint-disable-line
 
   const handleReset = useCallback(() => {
+    confirmedRef.current = [null, null, null, null];
     setConfirmedLetters([null, null, null, null]);
     setSlotFeedback([null, null, null, null]);
     setShowFeedback(false);
-    setLastGuessResult(null);
     resetGame();
   }, [resetGame]);
 
-  // Cor de cada slot
+  // Cor de cada slot consoante o estado
   const slotColor = (i) => {
     if (showFeedback && slotFeedback[i]) {
       if (slotFeedback[i] === 'correct') return { bg: '#39ff14', border: '#39ff14', text: '#000', glow: 'rgba(57,255,20,0.5)' };
@@ -232,7 +225,7 @@ function GameScreen({ onBack }) {
       if (slotFeedback[i] === 'absent')  return { bg: '#ff2244', border: '#ff2244', text: '#fff', glow: 'rgba(255,34,68,0.5)' };
     }
     if (confirmedLetters[i]) return { bg: 'rgba(57,255,20,0.15)', border: '#39ff14', text: '#39ff14', glow: 'rgba(57,255,20,0.2)' };
-    if (displayLetters[i])   return { bg: 'rgba(255,107,0,0.1)', border: '#ff6b00', text: '#ff6b00', glow: 'rgba(255,107,0,0.2)' };
+    if (displayLetters[i])   return { bg: 'rgba(255,107,0,0.1)',  border: '#ff6b00', text: '#ff6b00', glow: 'rgba(255,107,0,0.2)' };
     return { bg: 'transparent', border: '#2a2a3e', text: 'transparent', glow: 'none' };
   };
 
@@ -241,18 +234,6 @@ function GameScreen({ onBack }) {
   return (
     <div style={g.screen}>
       <style>{`
-        @keyframes popIn {
-          0%   { transform: scale(0.8); opacity: 0; }
-          60%  { transform: scale(1.1); }
-          100% { transform: scale(1);   opacity: 1; }
-        }
-        @keyframes shake {
-          0%,100% { transform: translateX(0); }
-          20%     { transform: translateX(-10px); }
-          40%     { transform: translateX(10px); }
-          60%     { transform: translateX(-7px); }
-          80%     { transform: translateX(7px); }
-        }
         @keyframes feedbackPulse {
           0%   { transform: scale(1); }
           30%  { transform: scale(1.15); }
@@ -264,16 +245,13 @@ function GameScreen({ onBack }) {
         }
         .slot-animate { animation: feedbackPulse 0.4s ease forwards; }
         .voltar-btn:hover { background: rgba(255,107,0,0.15) !important; border-color: #ff6b00 !important; color: #ff6b00 !important; }
-        .jogar-btn:hover { transform: scale(1.04); box-shadow: 0 0 28px rgba(255,107,0,0.7) !important; }
-        .del-btn:hover { background: rgba(255,34,68,0.2) !important; border-color: #ff2244 !important; }
+        .jogar-btn:hover  { transform: scale(1.04); box-shadow: 0 0 28px rgba(255,107,0,0.7) !important; }
+        .del-btn:hover    { background: rgba(255,34,68,0.2) !important; border-color: #ff2244 !important; }
       `}</style>
 
-      {/* ── TOAST ── */}
-      {toast && (
-        <div style={g.toast}>{toast}</div>
-      )}
+      {toast && <div style={g.toast}>{toast}</div>}
 
-      {/* ── HEADER ── */}
+      {/* HEADER */}
       <div style={g.header}>
         <button className="voltar-btn" style={g.voltarBtn} onClick={onBack}>
           ← VOLTAR
@@ -288,10 +266,10 @@ function GameScreen({ onBack }) {
         </div>
       </div>
 
-      {/* ── CORPO PRINCIPAL ── */}
+      {/* CORPO */}
       <div style={g.body}>
 
-        {/* ── LADO ESQUERDO: câmara ── */}
+        {/* Câmara */}
         <div style={g.leftCol}>
           <Camera
             onLetterDetected={(letter) => addLetter(letter, slotsToFill)}
@@ -301,10 +279,9 @@ function GameScreen({ onBack }) {
           />
         </div>
 
-        {/* ── LADO DIREITO: jogo ── */}
+        {/* Jogo */}
         <div style={g.rightCol}>
 
-          {/* Histórico de tentativas */}
           {guesses.length > 0 && (
             <div style={g.history}>
               {guesses.map((guess, gi) => (
@@ -327,7 +304,7 @@ function GameScreen({ onBack }) {
             </div>
           )}
 
-          {/* ── 4 SLOTS GRANDES (palavra atual) ── */}
+          {/* 4 slots grandes */}
           <div style={g.slotsRow}>
             {[0,1,2,3].map(i => {
               const col = slotColor(i);
@@ -351,7 +328,7 @@ function GameScreen({ onBack }) {
             })}
           </div>
 
-          {/* ── BOTÕES DE AÇÃO ── */}
+          {/* Botões */}
           {gameStatus === 'playing' ? (
             <div style={g.actionRow}>
               <button
@@ -366,11 +343,11 @@ function GameScreen({ onBack }) {
                 className="jogar-btn"
                 style={{
                   ...g.enterBtn,
-                  opacity: currentGuess.length < wordLength ? 0.5 : 1,
-                  cursor: currentGuess.length < wordLength ? 'not-allowed' : 'pointer',
+                  opacity: currentGuess.length < slotsToFill ? 0.5 : 1,
+                  cursor:  currentGuess.length < slotsToFill ? 'not-allowed' : 'pointer',
                 }}
                 onClick={handleSubmit}
-                disabled={currentGuess.length < wordLength}
+                disabled={currentGuess.length < slotsToFill}
               >
                 CONFIRMAR ✓
               </button>
@@ -381,7 +358,9 @@ function GameScreen({ onBack }) {
                 ...g.gameOverBadge,
                 borderColor: gameStatus === 'won' ? '#39ff14' : '#ff2244',
                 color:       gameStatus === 'won' ? '#39ff14' : '#ff2244',
-                boxShadow:   gameStatus === 'won' ? '0 0 24px rgba(57,255,20,0.3)' : '0 0 24px rgba(255,34,68,0.3)',
+                boxShadow:   gameStatus === 'won'
+                  ? '0 0 24px rgba(57,255,20,0.3)'
+                  : '0 0 24px rgba(255,34,68,0.3)',
               }}>
                 {gameStatus === 'won' ? '🏆 GANHOU!' : `💀 Era: ${targetWord}`}
               </div>
@@ -398,17 +377,17 @@ function GameScreen({ onBack }) {
 }
 
 // ─────────────────────────────────────────────
-//  ROOT — controla qual ecrã está ativo
+//  ROOT
 // ─────────────────────────────────────────────
 export default function App() {
-  const [screen, setScreen] = useState('menu'); // 'menu' | 'game' | 'train'
+  const [screen, setScreen] = useState('menu');
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0f' }}>
       {screen === 'menu' && (
         <MenuScreen onPlay={() => setScreen('game')} onTrain={() => setScreen('train')} />
       )}
-      {screen === 'game' && <GameScreen onBack={() => setScreen('menu')} />}
+      {screen === 'game'  && <GameScreen   onBack={() => setScreen('menu')} />}
       {screen === 'train' && <TrainingMode onBack={() => setScreen('menu')} />}
     </div>
   );
@@ -461,9 +440,7 @@ const m = {
     animation: 'float 3s ease-in-out infinite',
     filter: 'drop-shadow(0 0 20px rgba(255,107,0,0.5))',
   },
-  titleBlock: {
-    textAlign: 'center',
-  },
+  titleBlock: { textAlign: 'center' },
   title: {
     display: 'block',
     fontFamily: 'Black Ops One, cursive',
@@ -672,7 +649,6 @@ const g = {
     flex: '1 1 300px',
     maxWidth: '480px',
   },
-  // Histórico compacto
   history: {
     display: 'flex',
     flexDirection: 'column',
@@ -680,10 +656,7 @@ const g = {
     width: '100%',
     alignItems: 'center',
   },
-  historyRow: {
-    display: 'flex',
-    gap: '6px',
-  },
+  historyRow: { display: 'flex', gap: '6px' },
   historyCell: {
     width: '42px',
     height: '42px',
@@ -694,7 +667,6 @@ const g = {
     fontFamily: 'Black Ops One, cursive',
     fontSize: '1.2rem',
   },
-  // 4 slots grandes
   slotsRow: {
     display: 'flex',
     gap: '16px',
@@ -711,7 +683,6 @@ const g = {
     fontSize: '3rem',
     userSelect: 'none',
   },
-  // Botões ação
   actionRow: {
     display: 'flex',
     gap: '12px',
@@ -748,7 +719,6 @@ const g = {
     boxShadow: '0 0 20px rgba(255,107,0,0.4)',
     transition: 'all 0.2s ease',
   },
-  // Game over
   gameOverBlock: {
     display: 'flex',
     flexDirection: 'column',
@@ -774,38 +744,5 @@ const g = {
     cursor: 'pointer',
     letterSpacing: '0.1em',
     boxShadow: '0 0 20px rgba(255,107,0,0.4)',
-  },
-  // Teclado auxiliar
-  keyboardSection: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  keyboardLabel: {
-    fontFamily: 'Share Tech Mono, monospace',
-    fontSize: '0.65rem',
-    color: '#3a3a5c',
-    letterSpacing: '0.1em',
-    marginBottom: '4px',
-  },
-  kbRow: {
-    display: 'flex',
-    gap: '4px',
-    justifyContent: 'center',
-  },
-  kbKey: {
-    width: '34px',
-    height: '40px',
-    background: '#1a1a26',
-    border: '1px solid #2a2a3e',
-    borderRadius: '6px',
-    color: '#c0c0d8',
-    fontFamily: 'Rajdhani, sans-serif',
-    fontWeight: 700,
-    fontSize: '0.85rem',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
   },
 };
