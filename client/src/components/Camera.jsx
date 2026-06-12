@@ -605,7 +605,7 @@ export default function Camera({ onLetterDetected, active, currentGuessLength, w
             </div>
 
 
-            {/* Botão toggle painel */}
+            {/* Botão toggle painel 
             <button
               style={{...s.toggleBtn, background: panelOpen ? 'rgba(255,107,0,.92)' : 'rgba(0,0,0,.78)'}}
               onClick={() => setPanelOpen(p => !p)}
