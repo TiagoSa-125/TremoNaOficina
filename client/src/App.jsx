@@ -119,18 +119,6 @@ function GameScreen({ onBack }) {
     setTimeout(() => setToast(''), dur);
   }, []);
 
-  // Keyboard físico
-  useEffect(() => {
-    const h = (e) => {
-      if (e.ctrlKey || e.altKey || e.metaKey) return;
-      if (e.key === 'Enter') handleSubmit();
-      else if (e.key === 'Backspace') deleteLetter();
-      else if (/^[a-zA-ZÀ-ú]$/.test(e.key)) addLetter(e.key.toUpperCase());
-    };
-    window.addEventListener('keydown', h);
-    return () => window.removeEventListener('keydown', h);
-  }, [addLetter, deleteLetter]);
-
   // Quando muda guesses (nova tentativa submetida), calcular feedback
   useEffect(() => {
     if (guesses.length === 0) return;
@@ -149,23 +137,25 @@ function GameScreen({ onBack }) {
     });
     setConfirmedLetters(newConfirmed);
 
-    // Após 1.2s limpa feedback e reseta (mas letras corretas ficam)
+    // Após 1.2s limpa feedback visual (o toast de vitória/derrota é tratado
+    // separadamente pelo efeito que observa gameStatus)
     const t = setTimeout(() => {
       setShowFeedback(false);
       setSlotFeedback([null, null, null, null]);
-      if (gameStatus === 'won') {
-        showToast('🏆 PALAVRA CERTA! GANHOU!', 3000);
-      } else if (gameStatus === 'lost') {
-        showToast(`Era: ${targetWord}`, 3500);
-      }
     }, 1200);
     return () => clearTimeout(t);
   }, [guesses.length]);
 
-  // Mensagens de estado
+  // Mensagens de estado — disparado quando o jogo termina
   useEffect(() => {
-    if (gameStatus === 'won') showToast('🏆 ESPETACULAR! GANHOU!', 3000);
-    if (gameStatus === 'lost') showToast(`💀 Era: ${targetWord}`, 3500);
+    if (gameStatus === 'won') {
+      const t = setTimeout(() => showToast('🏆 ESPETACULAR! GANHOU!', 3500), 1200);
+      return () => clearTimeout(t);
+    }
+    if (gameStatus === 'lost') {
+      const t = setTimeout(() => showToast(`💀 Era: ${targetWord}`, 4000), 1200);
+      return () => clearTimeout(t);
+    }
   }, [gameStatus]);
 
   const handleSubmit = useCallback(() => {
@@ -175,6 +165,29 @@ function GameScreen({ onBack }) {
     }
     submitGuess();
   }, [currentGuess, wordLength, submitGuess, showToast]);
+
+  // Teclado físico — apenas confirmar (Enter) e apagar (Backspace).
+  // As letras só podem ser introduzidas por gestos LGP na câmara.
+  useEffect(() => {
+    const h = (e) => {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key === 'Enter') handleSubmit();
+      else if (e.key === 'Backspace') deleteLetter();
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [handleSubmit, deleteLetter]);
+
+  // Submeter automaticamente quando a palavra atinge o comprimento exigido
+  // (necessário para o fluxo por câmara/gestos, que não dispara Enter)
+  useEffect(() => {
+    if (gameStatus !== 'playing') return;
+    if (currentGuess.length !== wordLength) return;
+    const t = setTimeout(() => {
+      submitGuess();
+    }, 350); // pequena pausa para o utilizador ver a 4ª letra preenchida
+    return () => clearTimeout(t);
+  }, [currentGuess, wordLength, gameStatus, submitGuess]);
 
   const handleReset = useCallback(() => {
     setConfirmedLetters([null, null, null, null]);
@@ -358,21 +371,6 @@ function GameScreen({ onBack }) {
             </div>
           )}
 
-          {/* Teclado virtual auxiliar */}
-          <div style={g.keyboardSection}>
-            <p style={g.keyboardLabel}>— ou escreve com o teclado —</p>
-            {[
-              ['Q','W','E','R','T','Y','U','I','O','P'],
-              ['A','S','D','F','G','H','J','K','L'],
-              ['Z','X','C','V','B','N','M'],
-            ].map((row, ri) => (
-              <div key={ri} style={g.kbRow}>
-                {row.map(k => (
-                  <button key={k} style={g.kbKey} onClick={() => addLetter(k)}>{k}</button>
-                ))}
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
