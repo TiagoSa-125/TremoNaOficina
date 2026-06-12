@@ -5,9 +5,9 @@ const WORD_LENGTH = 4;
 
 export function useGame() {
   const [targetWord, setTargetWord] = useState('');
-  const [guesses, setGuesses] = useState([]); // palavras já submetidas
-  const [currentGuess, setCurrentGuess] = useState(''); // palavra atual
-  const [gameStatus, setGameStatus] = useState('playing'); // 'playing' | 'won' | 'lost'
+  const [guesses, setGuesses] = useState([]);
+  const [currentGuess, setCurrentGuess] = useState('');
+  const [gameStatus, setGameStatus] = useState('playing');
   const [validWords, setValidWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -30,7 +30,7 @@ export function useGame() {
         console.error('Erro ao carregar dados:', err);
         // Fallback offline
         setTargetWord('GATO');
-        setValidWords(['GATO', 'CASA', 'AMOR', 'VIDA', 'ÁGUA', 'BOLA', 'FOGO', 'MESA', 'NOTA', 'PATO']);
+        setValidWords(['GATO', 'CASA', 'AMOR', 'VIDA', 'BOLA', 'FOGO', 'MESA', 'NOTA', 'PATO']);
       } finally {
         setLoading(false);
       }
@@ -82,9 +82,10 @@ export function useGame() {
   }, [targetWord]);
 
   // Adicionar letra à palavra atual
-  const addLetter = useCallback((letter) => {
+  // maxLetters = quantas posições ainda faltam preencher (passado pelo App)
+  const addLetter = useCallback((letter, maxLetters = WORD_LENGTH) => {
     if (gameStatus !== 'playing') return;
-    if (currentGuess.length >= WORD_LENGTH) return;
+    if (currentGuess.length >= maxLetters) return;
     setCurrentGuess(prev => prev + letter.toUpperCase());
   }, [currentGuess, gameStatus]);
 
@@ -94,23 +95,28 @@ export function useGame() {
     setCurrentGuess(prev => prev.slice(0, -1));
   }, [gameStatus]);
 
-  // Submeter tentativa
-  const submitGuess = useCallback(() => {
+  // ─── CORRIGIDO ───────────────────────────────────────────────────────────
+  // submitGuess agora aceita a fullGuess montada pelo App (com letras
+  // confirmadas incluídas) em vez de usar currentGuess diretamente.
+  // Isso resolve o bug de vitória não ser detetada quando há letras confirmadas.
+  const submitGuess = useCallback((fullGuess) => {
     if (gameStatus !== 'playing') return;
 
-    if (currentGuess.length < WORD_LENGTH) {
+    const wordToCheck = (fullGuess || currentGuess).toUpperCase();
+
+    if (wordToCheck.length < WORD_LENGTH) {
       showMessage('Palavra incompleta! Precisa de 4 letras.');
       triggerShake();
       return;
     }
 
-    const evaluation = evaluateGuess(currentGuess);
-    const newGuess = { word: currentGuess, evaluation };
+    const evaluation = evaluateGuess(wordToCheck);
+    const newGuess = { word: wordToCheck, evaluation };
     const newGuesses = [...guesses, newGuess];
     setGuesses(newGuesses);
     setCurrentGuess('');
 
-    if (currentGuess === targetWord) {
+    if (wordToCheck === targetWord) {
       const msgs = ['ESPETACULAR! 🤌', 'FANTÁSTICO! 💪', 'INCRÍVEL! ⚡', 'MUITO BEM! 🎯'];
       showMessage(msgs[Math.floor(Math.random() * msgs.length)], 3000);
       setGameStatus('won');

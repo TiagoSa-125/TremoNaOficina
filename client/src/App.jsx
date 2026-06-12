@@ -206,13 +206,15 @@ function GameScreen({ onBack }) {
   // não dispara Enter)
   useEffect(() => {
     if (gameStatus !== 'playing') return;
+    if (slotsToFill === 0) return; // nada para preencher
     if (currentGuess.length !== slotsToFill) return;
-    if (slotsToFill === 0) return; // nada para preencher (não deve acontecer)
+    // fullGuess tem SEMPRE 4 letras aqui (confirmadas + currentGuess)
+    const guessSnapshot = fullGuess;
     const t = setTimeout(() => {
-      submitGuess(fullGuess);
+      submitGuess(guessSnapshot);
     }, 350); // pequena pausa para o utilizador ver a última letra preenchida
     return () => clearTimeout(t);
-  }, [currentGuess, slotsToFill, fullGuess, gameStatus, submitGuess]);
+  }, [currentGuess.length, slotsToFill, gameStatus]); // eslint-disable-line
 
   const handleReset = useCallback(() => {
     setConfirmedLetters([null, null, null, null]);
@@ -292,10 +294,10 @@ function GameScreen({ onBack }) {
         {/* ── LADO ESQUERDO: câmara ── */}
         <div style={g.leftCol}>
           <Camera
-            onLetterDetected={addLetter}
+            onLetterDetected={(letter) => addLetter(letter, slotsToFill)}
             active={gameStatus === 'playing'}
             currentGuessLength={currentGuess.length}
-            wordLength={wordLength}
+            wordLength={slotsToFill}
           />
         </div>
 
