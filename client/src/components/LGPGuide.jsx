@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+/*import React, { useState } from 'react';
 
 // Descrições dos gestos LGP para cada letra
 const LGP_GUIDE = {
@@ -149,3 +149,4 @@ const styles = {
     lineHeight: '1.3',
   },
 };
+*/
