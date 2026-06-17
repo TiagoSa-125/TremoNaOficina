@@ -141,7 +141,7 @@ function GameScreen({ onBack }) {
 
   useEffect(() => {
     if (gameStatus === 'won') {
-      const t = setTimeout(() => showToast('🏆 GANHOU!'), 1200);
+      const t = setTimeout(() => showToast('🏆 GANHASTE,PARABENS!'), 1200);
       return () => clearTimeout(t);
     }
     if (gameStatus === 'lost') {
@@ -446,7 +446,7 @@ function GameScreen({ onBack }) {
           {gameStatus !== 'playing' && (
             <div style={g.gameOverBlock}>
               <div style={g.gameOverBadge}>
-                {gameStatus === 'won' ? '🏆 GANHOU!' : `💀 Era: ${targetWord}`}
+                {gameStatus === 'won' ? '🏆 GANHASTE!' : `💀 Era: ${targetWord}`}
               </div>
               <button className="btn-novo-jogo" style={g.newGameBtn} onClick={handleReset}>
                 ↺ NOVO JOGO
