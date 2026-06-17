@@ -12,7 +12,6 @@ Adivinha palavras de **4 letras** usando gestos com a câmara!
 
 ### 2. Instalar dependências
 
-```bash
 # Na pasta raiz do projeto
 npm install
 
@@ -23,17 +22,15 @@ cd server && npm install && cd ..
 cd client && npm install && cd ..
 ```
 
-Ou tudo de uma vez:
-```bash
+# Ou tudo de uma vez:
 npm run install:all
-```
+
 
 ### 3. Correr a aplicação
 
-```bash
 # Corre servidor + cliente em simultâneo
 npm run dev
-```
+
 
 - **Servidor** corre na porta `3001`
 - **Cliente** corre na porta `3000`
@@ -57,24 +54,11 @@ npm run dev
 6. Tens **6 tentativas** para acertar!
 
 ### Podes também usar:
-- ⌨️ **Teclado físico** — escreve diretamente
-- 🖱️ **Teclado virtual** — clica nas letras no ecrã
+- ⌨️ **Teclado físico** — escreve diretamente com enter e backspace para apagar e confirmar as letras
+- 🖱️ **Teclado virtual** — clica nos botoes de apagar ou confirmar no ecrã
 
 ---
 
-## 🖐 Gestos LGP (Alfabeto Manual Português)
-
-| Letra | Gesto |
-|-------|-------|
-| A | Mão fechada, polegar ao lado |
-| B | 4 dedos juntos para cima |
-| C | Mão em forma de C |
-| D | Indicador para cima, polegar toca no médio |
-| E | Todos os dedos dobrados |
-| F | Polegar + indicador em círculo |
-| ... | Ver guia na aplicação |
-
----
 
 ## 🛠 Tecnologias
 
@@ -96,7 +80,6 @@ tremu-na-oficina/
 │       │   ├── Camera.jsx       # Câmara + MediaPipe
 │       │   ├── GameBoard.jsx    # Grelha do jogo
 │       │   ├── Keyboard.jsx     # Teclado virtual
-│       │   └── LGPGuide.jsx     # Guia de gestos
 │       ├── hooks/
 │       │   ├── useGame.js           # Lógica do jogo
 │       │   └── useGestureDetection.js # Deteção LGP
