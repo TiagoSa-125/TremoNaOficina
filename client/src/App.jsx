@@ -284,6 +284,20 @@ function GameScreen({ onBack }) {
           transform: scale(1.05);
           box-shadow: 0 0 30px rgba(255,107,0,0.65);
         }
+
+        /* ── Em mobile a câmara e a coluna direita empilham-se, e a câmara
+           saía do ecrã quando fazias scroll para ver o abecedário. Aqui ela
+           fica "colada" no topo enquanto fazes scroll pelo resto. ── */
+        @media (max-width: 820px) {
+          .camera-col {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: #0a0a0f;
+            padding: 8px 0 12px;
+            box-shadow: 0 10px 18px rgba(0,0,0,0.45);
+          }
+        }
       `}</style>
 
       {toast && <div style={g.toast}>{toast}</div>}
@@ -303,7 +317,7 @@ function GameScreen({ onBack }) {
       </div>
 
       <div style={g.body}>
-        <div style={g.leftCol}>
+        <div className="camera-col" style={g.leftCol}>
           <Camera
             onLetterDetected={(letter) => addLetter(letter, slotsToFill)}
             active={gameStatus === 'playing'}
