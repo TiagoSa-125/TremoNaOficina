@@ -24,6 +24,14 @@ function MenuScreen({ onPlay, onTrain }) {
           from { opacity: 0; transform: translateY(30px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+        .btn-treino { transition: all 0.18s ease; }
+        .btn-treino:hover {
+          background: rgba(255,170,0,0.12) !important;
+          border-color: #ffaa00 !important;
+          color: #ffcc55 !important;
+          transform: scale(1.04);
+          box-shadow: 0 0 18px rgba(255,170,0,0.35);
+        }
       `}</style>
 
       <div style={m.scanline} />
@@ -57,7 +65,7 @@ function MenuScreen({ onPlay, onTrain }) {
             → Para ESCONDER: envolve o botão abaixo com  {/*  e  *\/}
             → Para MOSTRAR: remove esses comentários
         ══════════════════════════════════════════════════════════════ */}
-        <button style={m.trainBtn} onClick={onTrain}>
+        <button className="btn-treino" style={m.trainBtn} onClick={onTrain}>
           🎓 Modo de Treino (gestos)
         </button>
 
@@ -234,12 +242,54 @@ function GameScreen({ onBack }) {
           border-color: #ff6b00 !important;
           transform: scale(1.06);
         }
+
+        /* ── Hover dos botões ── */
+        .btn-voltar { transition: all 0.18s ease; }
+        .btn-voltar:hover {
+          border-color: #ff6b00 !important;
+          color: #ff6b00 !important;
+          background: rgba(255,107,0,0.08) !important;
+        }
+
+        .btn-apagar:hover {
+          border-color: #ff2244 !important;
+          background: rgba(255,34,68,0.2) !important;
+          transform: scale(1.04);
+        }
+
+        .btn-confirmar:hover:not(:disabled) {
+          transform: scale(1.05);
+          box-shadow: 0 0 30px rgba(255,107,0,0.65);
+        }
+        .btn-confirmar:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+
+        .btn-alfabeto { transition: all 0.18s ease; }
+        .btn-alfabeto:hover { transform: scale(1.03); }
+        .btn-alfabeto:not(.active):hover {
+          border-color: #ff6b00 !important;
+          color: #ff6b00 !important;
+          background: rgba(255,107,0,0.1) !important;
+        }
+        .btn-alfabeto.active:hover {
+          box-shadow: 0 0 26px rgba(255,107,0,0.6);
+          filter: brightness(1.08);
+        }
+
+        .btn-novo-jogo { transition: all 0.18s ease; }
+        .btn-novo-jogo:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 30px rgba(255,107,0,0.65);
+        }
       `}</style>
 
       {toast && <div style={g.toast}>{toast}</div>}
 
       <div style={g.header}>
-        <button style={g.voltarBtn} onClick={onBack}>← VOLTAR</button>
+        <button className="btn-voltar" style={g.voltarBtn} onClick={onBack}>← VOLTAR</button>
 
         <div style={g.titleBlock}>
           <span style={g.title}>TREMU</span>
@@ -319,11 +369,12 @@ function GameScreen({ onBack }) {
           {gameStatus === 'playing' && (
             <>
               <div style={g.actionRow}>
-                <button style={g.delBtn} onClick={deleteLetter}>
+                <button className="btn-apagar" style={g.delBtn} onClick={deleteLetter}>
                   ⌫ APAGAR
                 </button>
 
                 <button
+                  className="btn-confirmar"
                   style={g.enterBtn}
                   onClick={handleSubmit}
                   disabled={currentGuess.length < slotsToFill}
@@ -335,6 +386,7 @@ function GameScreen({ onBack }) {
               {/* BOTÃO ALFABETO — agora é o mesmo que estava na câmara,
                   só que fica aqui em baixo do Apagar/Confirmar */}
               <button
+                className={`btn-alfabeto ${showAlphabet ? 'active' : ''}`}
                 style={{ ...g.alphabetBtn, ...(showAlphabet ? g.alphabetBtnActive : {}) }}
                 onClick={() => setShowAlphabet(v => !v)}
               >
@@ -403,7 +455,7 @@ function GameScreen({ onBack }) {
               <div style={g.gameOverBadge}>
                 {gameStatus === 'won' ? '🏆 GANHOU!' : `💀 Era: ${targetWord}`}
               </div>
-              <button style={g.newGameBtn} onClick={handleReset}>
+              <button className="btn-novo-jogo" style={g.newGameBtn} onClick={handleReset}>
                 ↺ NOVO JOGO
               </button>
             </div>
