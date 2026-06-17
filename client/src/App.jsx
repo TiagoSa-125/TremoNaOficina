@@ -65,9 +65,9 @@ function MenuScreen({ onPlay, onTrain }) {
             → Para ESCONDER: envolve o botão abaixo com  {/*  e  *\/}
             → Para MOSTRAR: remove esses comentários
         ══════════════════════════════════════════════════════════════ */}
-        {/*<button className="btn-treino" style={m.trainBtn} onClick={onTrain}>
+        <button className="btn-treino" style={m.trainBtn} onClick={onTrain}>
           🎓 Modo de Treino (gestos)
-        </button>*/}
+        </button>
 
         <div style={m.legend}>
           <div style={m.legendRow}>
@@ -107,9 +107,7 @@ function GameScreen({ onBack }) {
 
   // Painel do alfabeto LGP (antes vivia dentro da Camera, agora fica aqui)
   const [showAlphabet, setShowAlphabet]   = useState(false);
-  const [detectedLetter, setDetectedLetter] = useState(null);
   const [selectedLetter, setSelectedLetter] = useState('A');
-  const [searchLetter, setSearchLetter]     = useState('');
 
   const confirmedRef = useRef([null, null, null, null]);
 
@@ -207,9 +205,6 @@ function GameScreen({ onBack }) {
   const attemptsLeft = 6 - guesses.length;
 
   // Dados do painel do alfabeto (movidos para fora da Camera)
-  const filteredLetters = LGP_ALPHABET.filter(i =>
-    searchLetter === '' || i.letter === searchLetter.toUpperCase()
-  );
   const selectedAlphabetData = LGP_ALPHABET.find(l => l.letter === selectedLetter) || LGP_ALPHABET[0];
 
   return (
@@ -323,10 +318,6 @@ function GameScreen({ onBack }) {
             active={gameStatus === 'playing'}
             currentGuessLength={currentGuess.length}
             wordLength={slotsToFill}
-            onDetectedLetterChange={(letter) => {
-              setDetectedLetter(letter);
-              if (letter) setSelectedLetter(letter);
-            }}
           />
         </div>
 
@@ -413,18 +404,10 @@ function GameScreen({ onBack }) {
                 <div style={g.alphabetPanel}>
                   <div style={g.alphabetHead}>
                     <span style={g.alphabetTitle}>Alfabeto Oficial LGP</span>
-                    <input
-                      style={g.alphabetSearch}
-                      placeholder="A…"
-                      value={searchLetter}
-                      onChange={e => setSearchLetter(e.target.value)}
-                      maxLength={1}
-                    />
                   </div>
 
                   <div style={g.alphabetGrid}>
-                    {filteredLetters.map(({ letter }) => {
-                      const isDetected = detectedLetter === letter;
+                    {LGP_ALPHABET.map(({ letter }) => {
                       const isSelected = selectedLetter === letter;
                       return (
                         <div
@@ -433,10 +416,9 @@ function GameScreen({ onBack }) {
                           onClick={() => setSelectedLetter(letter)}
                           style={{
                             ...g.alphabetChip,
-                            background: isDetected ? 'rgba(255,107,0,.3)' : isSelected ? 'rgba(255,170,0,.15)' : 'rgba(10,10,15,.85)',
-                            border: `1px solid ${isDetected ? '#ff6b00' : isSelected ? '#ffaa00' : 'rgba(42,42,62,.8)'}`,
-                            color: isDetected ? '#ff6b00' : isSelected ? '#ffaa00' : '#aaa',
-                            animation: isDetected ? 'chipPulse .7s ease infinite' : 'none',
+                            background: isSelected ? 'rgba(255,170,0,.15)' : 'rgba(10,10,15,.85)',
+                            border: `1px solid ${isSelected ? '#ffaa00' : 'rgba(42,42,62,.8)'}`,
+                            color: isSelected ? '#ffaa00' : '#aaa',
                           }}
                         >
                           {letter}
@@ -449,13 +431,10 @@ function GameScreen({ onBack }) {
                     <LetterPhoto
                       letter={selectedAlphabetData.letter}
                       size={88}
-                      highlight={detectedLetter === selectedAlphabetData.letter}
                     />
                     <div style={g.alphabetDetailText}>
                       <span style={g.alphabetDetailLetter}>{selectedAlphabetData.letter}</span>
                       <span style={g.alphabetDetailDesc}>{selectedAlphabetData.desc}</span>
-                      {detectedLetter === selectedAlphabetData.letter &&
-                        <span style={g.alphabetDetailOk}>✅ Correto!</span>}
                     </div>
                   </div>
                 </div>
@@ -580,9 +559,6 @@ const g = {
                    padding:'14px', animation:'panelFadeIn 0.25s ease' },
   alphabetHead: { display:'flex', alignItems:'center', justifyContent:'space-between' },
   alphabetTitle: { fontFamily:'Black Ops One, cursive', fontSize:'0.85rem', color:'#ff6b00', letterSpacing:'0.04em' },
-  alphabetSearch: { width:'40px', padding:'4px 6px', background:'rgba(42,42,62,.9)', border:'1px solid #3a3a5c',
-                    borderRadius:'6px', color:'#e8e8f0', fontFamily:'Share Tech Mono, monospace', fontSize:'0.9rem',
-                    textTransform:'uppercase', outline:'none', textAlign:'center' },
   alphabetGrid: { display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(38px, 1fr))', gap:'5px' },
   alphabetChip: { padding:'8px 2px', borderRadius:'6px', textAlign:'center', fontFamily:'Black Ops One, cursive',
                   fontSize:'0.95rem', userSelect:'none', cursor:'pointer', transition:'all 0.12s ease' },
