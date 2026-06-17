@@ -38,7 +38,7 @@ npm run dev
 ### 4. Tornar público no Codespace
 
 1. Vai ao painel **PORTS** (menu inferior do VS Code)
-2. Clica com o botão direito na porta `3000`
+2. Clica com o botão direito na porta `3000` e `3001`
 3. Seleciona **Port Visibility → Public**
 4. Copia o URL e partilha!
 
