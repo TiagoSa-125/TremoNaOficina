@@ -65,9 +65,9 @@ function MenuScreen({ onPlay, onTrain }) {
             → Para ESCONDER: envolve o botão abaixo com  {/*  e  *\/}
             → Para MOSTRAR: remove esses comentários
         ══════════════════════════════════════════════════════════════ */}
-        <button className="btn-treino" style={m.trainBtn} onClick={onTrain}>
+        {/* <button className="btn-treino" style={m.trainBtn} onClick={onTrain}>
           🎓 Modo de Treino (gestos)
-        </button>
+        </button>*\}
 
         <div style={m.legend}>
           <div style={m.legendRow}>
