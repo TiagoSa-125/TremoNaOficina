@@ -67,7 +67,7 @@ function MenuScreen({ onPlay, onTrain }) {
         ══════════════════════════════════════════════════════════════ */}
         {/* <button className="btn-treino" style={m.trainBtn} onClick={onTrain}>
           🎓 Modo de Treino (gestos)
-        </button>*\}
+        </button>*/}
 
         <div style={m.legend}>
           <div style={m.legendRow}>
