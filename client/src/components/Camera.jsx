@@ -57,7 +57,8 @@ function getLetterPos(letter) {
   return { x, y };
 }
 
-// ─── Componente de foto da letra APS ─────────────────────────────────────────
+// ─── Componente de foto da letra APS ────────────
+// ─────────────────────────────
 // Usa CSS background-position para recortar a célula certa do sprite.
 // Exportado para poder ser usado no painel do alfabeto fora da câmara.
 export function LetterPhoto({ letter, size = 90, highlight = false }) {

@@ -42,6 +42,8 @@ npm run dev
 3. Seleciona **Port Visibility → Public**
 4. Copia o URL e partilha!
 
+Ou abre a app do vercel e joga 
+
 ---
 
 ## 🎮 Como Jogar
